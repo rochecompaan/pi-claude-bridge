@@ -2,6 +2,7 @@
 
 ## UNRELEASED
 
+- Fix active history edits: Claude Code now restarts from pi's selected history before receiving tool results, even without a rewrite event.
 - **Fix: preserve matching conversation history (#222)** — Detect content edits and retain matching Claude Code records through rewinds, interruptions and restarts.
 - **Fix: AskClaude's shared-mode description overstated its context** — it said Claude sees the full conversation history, but same-model calls see the recorded history. The tool description now says so.
 

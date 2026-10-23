@@ -1855,8 +1855,13 @@ function streamClaudeAgentSdk(model: Model<any>, context: Context, options?: Sim
 	// this tool result carry the turn into a fresh query over the rewritten history.
 	// The staleness mark is per pi session: a subagent's compaction (its own
 	// AgentSession, sharing this process) must not discard the parent's parked
-	// query, and vice versa.
-	const rewrittenUnderQuery = Boolean(resultCtx?.historyStale);
+	// query, and vice versa. Extensions can also edit the selected history without
+	// a rewrite event; compare the live prefix before feeding this query a result.
+	let rewrittenUnderQuery: boolean;
+	try {
+		rewrittenUnderQuery = Boolean(resultCtx && (resultCtx.historyStale
+			|| !resultCtx.recording.continues(nonSystemMessages(context.messages))));
+	} catch (error) { return failBeforeQuery(error); }
 	if (resultCtx && rewrittenUnderQuery) {
 		traceEvent("route", { callId: traceCallId, route: "discard-rewritten", queryId: resultCtx.traceQueryId });
 		try { discardRewrittenQuery(resultCtx); }
